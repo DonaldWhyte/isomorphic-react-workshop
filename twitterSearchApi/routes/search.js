@@ -32,6 +32,8 @@ function search(query) {
 const router = Router();
 
 router.post('/', function(req, res) {
+  debug('search/ with', JSON.stringify(req.body));
+
   const query = req.body.query;
   if (query) {
     search(query).then(function(tweets) {
