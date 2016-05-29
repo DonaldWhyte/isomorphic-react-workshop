@@ -1,0 +1,8 @@
+{
+    "twitter" : {
+        "consumerKey": "FILL_IN",
+        "consumerSecret": "FILL_IN",
+        "accessTokenKey": " FILL_IN",
+        "accessTokenSecret": "FILL_IN"
+    }
+}

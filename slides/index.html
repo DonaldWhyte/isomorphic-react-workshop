@@ -1284,6 +1284,11 @@ const app = express();
 app.use(bodyParser.json());
 
 app.use('/api/search', require('./routes/search'));
+
+const port = process.env.PORT || 8080;
+app.listen(port, function() {
+    console.log('Started twittersearchapi on port #{port}')
+});
             ```
           </section>
 
@@ -1292,7 +1297,6 @@ app.use('/api/search', require('./routes/search'));
 
              ```js
 import { Router } from 'express';
-import BasClient from '../../basclient/basclient.js';
 import Config from '../../config.js';
 
 router.post('/', function(req, res) {
@@ -1309,12 +1313,12 @@ import axios from 'axios';
 
 // put URL in config
 const API_URL = 'http://100.70.19.227:8080/api/search';
-const reqBody = { text: "@DonaldWhyte" };
+const reqBody = { query: "@DonaldWhyte" };
 
 axios.post(API_URL, reqBody).then(
   function(response) {
     // Log each returned tweet
-    tweets.forEach(function(t) {
+    response.tweets.forEach(function(t) {
       console.log(JSON.stringify(t));
     });
   },
