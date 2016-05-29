@@ -8,7 +8,12 @@ Talk on how to build isomorphic web apps in React, complete with example code.
 
 This workshop covers building a web application that allows users to search through tweets using the Twitter Search RESTful API.
 
-All of the code for this example application can be found in the `twitterSearchApp/` directory. Instructions on how to run and deploy that applic
+The code for this example application can be found in the following directories:
+
+* `twitterSearchApp/` -- contains isomorphic React single page application
+* `twitterSearchApi/` -- contains RESTFUL API for searching Twitter
+
+Instructions on how to run and deploy both the application and API are available in their respective directories.
 
 ## Running Presentation
 
@@ -16,6 +21,7 @@ You can also run the presentation on a local web server. Clone this
 repository and run the presentation like so:
 
 ```
+cd slides/
 npm install
 grunt serve
 ```

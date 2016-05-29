@@ -36,3 +36,6 @@ node_modules
 assets/bundle.js
 dist
 build
+
+# OS X cruft
+.DS_Store
