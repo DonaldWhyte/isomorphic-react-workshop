@@ -7,7 +7,7 @@
     "start": "NODE_PATH=$NODE_PATH:./shared NODE_ENV=production node --harmony .",
     "dev": "NODE_PATH=$NODE_PATH:./shared node --harmony .",
     "build": "webpack --progress --color -p --config webpack.config.js",
-    "devbuild": "webpack --progress --color -p --config webpack.config.js && NODE_PATH=$NODE_PATH:./shared node --harmony ."
+    "buildstart": "webpack --progress --color -p --config webpack.config.js && NODE_PATH=$NODE_PATH:./shared node --harmony ."
   },
   "author": "",
   "license": "ISC",

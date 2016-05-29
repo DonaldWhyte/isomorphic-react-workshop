@@ -22,10 +22,10 @@ export default class TweetTable extends React.Component {
         <Table striped bordered hover>
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Type</th>
-              <th>Group</th>
-              <th>Description</th>
+              <th>Author</th>
+              <th>Time</th>
+              <th>Contents</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>

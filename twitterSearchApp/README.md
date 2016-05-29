@@ -8,7 +8,7 @@ Use webpack's dev-server tool like so:
 
 ```
 sudo npm install -g webpack-dev-server
-webpack-dev-server --progress --colors --port 3000
+webpack-dev-server --progress --colors --port <PORT>
 ```
 
 The server will watch files specified in `webpack.config.js`
@@ -33,7 +33,13 @@ You can specify which port the server will listen on using the
 `PORT` environment variable:
 
 ```
-PORT=3000 npm start
+PORT=<PORT> npm start
+```
+
+Both you can build jundle.js and start the server in one go, with:
+
+```
+PORT<PORT> npm run buildstart
 ```
 
 ### Project Structure

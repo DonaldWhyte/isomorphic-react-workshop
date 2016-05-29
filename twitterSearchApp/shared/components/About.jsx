@@ -3,7 +3,7 @@ import { Row, Col, PageHeader } from 'react-bootstrap';
 
 const text = `
 This is an example React application that talks to a custom RESTful API to
-search Twitter using tweet's textual contents.
+search Twitter for tweets that contain certain text.
 `;
 
 export default function About() {
