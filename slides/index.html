@@ -1,0 +1,1556 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+
+    <title>Web Stack Training</title>
+
+    <meta name="description" content="Web Stack Training">
+    <meta name="author" content="Donald Whyte">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/theme/white.css" id="theme">
+    <link rel="stylesheet" href="css/custom.css">
+
+    <!-- Code syntax highlighting -->
+    <link rel="stylesheet" href="lib/css/zenburn.css">
+
+    <!-- Printing and PDF exports -->
+    <script>
+      var link = document.createElement( 'link' );
+      link.rel = 'stylesheet';
+      link.type = 'text/css';
+      link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+      document.getElementsByTagName( 'head' )[0].appendChild( link );
+    </script>
+
+    <!--[if lt IE 9]>
+    <script src="lib/js/html5shiv.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+    <div class="reveal">
+      <div class="slides">
+
+        <section>
+          <section>
+            <h1>Isomorphic React App Workshop</h1>
+            <h3>Building isomorphic web apps using React and Node</h3>
+
+            <p>
+                Created by <a href="http://donaldwhyte.co.uk">Donald Whyte</a>
+                / <a href="http://twitter.com/donald_whyte">@donald_whyte</a>
+            </p>
+
+            <div id="company-notice">
+              <img src="images/bloomberg.svg" alt="logo" />
+            </div>
+          </section>
+
+          <section data-markdown>
+            ### Why Build Web Applications?
+
+            * Wealth of open-source libraries and tools
+            * Easy to run the whole stack locally
+                - no reliance on heavy system dependencies that are difficult to isolate
+                - no need to rely on shared internal infrastructure
+            * Increases developer productivity
+                - allows for rapid development of new features
+          </section>
+
+          <section data-markdown>
+            Always good to try new things!
+          </section>
+
+          <section data-markdown>
+            ### Goal of this Talk
+
+            * Understand how modern web apps are structured
+            * Get an introduction to some frameworks and libraries which can implement these apps
+            * Walkthrough an example application
+                - React application
+                - backed by Node API
+          </section>
+
+          <section data-markdown data-notes="
+There will some live coding in this presentation, but it'll be kept to a minimum.
+
+The core focus of this talk is explaining the high-level process of building a modern web app, which leaves less time for interactive coding.
+
+But don't worry, there'll still be plenty of code examples, and there'll be
+example repos to look at after the ta;k.
+">
+            ### Scope
+
+            * Building a web application using a modern architecture
+            * Code examples given, but focus is on high-level process
+          </section>
+
+          <section data-markdown>
+            ### Pre-requisites
+
+            * Intermediate knowledge of JavaScript
+            * Understanding of:
+                - how web pages work (i.e. HTML/CSS/JavaScript)
+                - service-orientated architectures
+                - and a little bit about cloud computing
+          </section>
+        </section>
+
+        <section>
+          <section data-markdown>
+            ## Architecture
+          </section>
+
+          <section data-markdown>
+            Some history...
+          </section>
+
+          <section data-markdown class="architecture" data-notes="
+IBM mainframes in the 60s, 70s or well...now if you're in certain companies.
+">
+            ### Mainframes
+
+            > Thin client, heavy server
+
+            ![arch_mainframe](images/arch_mainframe.svg)
+          </section>
+
+          <section data-markdown class="architecture" data-notes="
+Old Instant messengers like MSN, AOL.
+
+Payroll management system, web browsers and so on.
+">
+            ### Desktop Clients
+
+            > Heavy client, thin server
+
+            ![arch_desktops](images/arch_desktops.svg)
+          </section>
+
+          <section data-markdown class="architecture" data-notes="
+All about generating markup and logic on server. Minimal client logic, which
+only handles basic user interaction.
+
+WordPress blogs. You go to a WordPress site and the server retrieves the
+necessary user and post data from a database, generates the HTML on the server
+and then returns it to the client.
+">
+            ### Birth of the Web
+
+            > Thin client, heavy server
+
+            ![arch_clientserver](images/arch_clientserver.svg)
+          </section>
+
+          <section data-markdown class="architecture" data-markdown="
+JavaScript-heavy clients where the web service simply services a single bootstrap
+HTML/JS bundle file.
+
+Data retrieved using separate thin, clean APIs.
+
+This is where modern web applications are right now.
+">
+            ### Single Page Application
+
+            > Heavy client, thin server
+
+            ![arch_wsap](images/arch_sap.svg)
+          </section>
+
+          <section data-markdown>
+            ```html
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Twitter Searcher&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div id="app-view"&gt;&lt;/div&gt;
+  &lt;script type="application/javascript" src="/assets/bundle.js"&gt;
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+            ```
+          </section>
+
+          <section data-markdown>
+            SAPs are becoming the standard approach in web dev.
+
+            Building SAPs will be the focus of this talk.
+          </section>
+
+          <section data-markdown data-notes="
+Mention AirBnB for example of SAP affecting performance.
+
+SEO -- An application that can only run in the client-side cannot serve HTML to crawlers, so it will have poor SEO by default. Web crawlers function by making a request to a web server and interpreting the result; but if the server returns a blank page, it’s not of much value. There are workarounds, but not without jumping through some hoops.
+
+Responsiveness -- users will experience a few critical seconds of blank page or loading spinner before seeing the content on the page.
+
+Maintainability -- while the ideal case can lead to a nice, clean separation of concerns, inevitably some bits of application logic or view logic end up duplicated between client and server, often in different languages. Common examples are date and currency formatting, form validations, and routing logic. This makes maintenance a nightmare, especially for more complex apps.
+
+http://nerds.airbnb.com/isomorphic-javascript-future-web-apps/
+">
+            ### Some Problems
+
+            * search engine optimisation
+            * performance
+                - responsiveness / page coherency
+            * maintainability
+          </section>
+
+          <section data-markdown>
+            ### Isomorphic Apps
+
+            * also known as *universal* apps
+            * render entire page in its initial state on server
+                - valid, renderable HTML that represents the page
+            * any state changes will be rendered by the SAP on the client browser
+          </section>
+
+          <section data-markdown>
+            ![client_side_sap](images/client_side_sap.png)
+          </section>
+
+          <section data-markdown>
+            ![isomorphic_sap](images/isomorphic_sap.png)
+          </section>
+        </section>
+
+        <section>
+          <section data-markdown>
+            ## The Stack
+          </section>
+
+          <section data-markdown>
+            ### Web App (Client &amp; Server)
+
+            Many popular frameworks:
+
+            * AngularJs
+            * Meteor
+            * Backbone
+            * React
+            * etc.
+
+            **React** will be used for this workshop
+          </section>
+
+          <section data-markdown data-notes="
+Done right, React components become well encapsulated building blocks that you
+can reuse in many other applications.
+">
+            ### React
+
+            ![react](images/react.svg)
+
+            * open-source JavaScript UI framework
+            * developed by Facebook
+            * separates a web page into *components*
+                - combined into a hierarchy and rendered
+            * become popular amongst many heavy-hit web apps
+                - *Instagram, AirBnB, Salesforce, Wolfram Alpha*
+          </section>
+
+          <section data-markdown data-notes="
+MVC, or model-view-controller, is a way of architecting interfaces in a way that
+separates the three primary concerns of a UI. These are:
+
+  - the model -- the underlying data stored
+  - the controller -- contains the business logic that retrieves/processes the
+                      underlying data and handles user interaction by changing
+                      model/view state
+  - the view -- takes the processed data and displays it the user, giving the
+                user interactive controls that talk to the controller
+">
+            ### Model-View Controller
+
+            ![mvc](images/mvc.svg)
+          </section>
+
+          <section data-markdown data-notes="
+It doesn't make sense to directly compare React with other, more complete
+opionated frameworks, such as AngularJs and Backbone.
+
+So if it's just the view, why are so many people raving about it?
+">
+            ### React is not an MVC framework
+
+            * the V in MVC
+            * but it's not just a HTML template engine
+                - HTML templates just generate textual markup
+            * React uses the **virtual DOM**
+                - its own lightweight representation of a doc
+            * virtual DOM is build from React **components**
+                - isolated, testable view components
+                - which handle their own state
+          </section>
+
+          <section data-markdown data-notes="
+React being just the view also makes this workshop a bit easier, since it means
+I can greatly simplify the server-side and model logic for brevity.
+">
+            ### Why React?
+
+            * React uses its virtual DOM for rendering
+                - does not depend on browsers
+                - allows page to be rendered on the client and server
+                - making it easier to build isomorphic apps
+            * React components are easily testable
+            * done right, components will also be reusable
+            * free to use whatever you want for the model/controller
+          </section>
+
+          <section data-markdown>
+            ### Server
+
+            * can use any language
+            * but we're building an isomorphic app
+            * requires ability to render HTML on client and server
+            * duplicating render logic won't scale
+            * unless we use **JavaScript** for the back-end
+                - share React render code!
+          </section>
+
+          <section data-markdown data-notes="
+Massive adoption in open-source community: https://nodesource.com/assets/blog/node-by-numbers/node-by-numbers.pdf
+
+Use in enteprise is growing: 015/04/09/node-js-is-hitting-the-big-time-in-enterprise-markets/
+">
+            ![nodejs](images/nodejs.svg)
+
+            * JavaScript runtime environment
+            * primarily built for server-side web applications
+            * event-driven, non-blocking IO
+            * massive adoption in the open-source community
+            * growing adoption in enterprise
+          </section>
+
+          <section data-markdown data-notes="
+Ussing a transipler like Babel allowa us to make full use of ES6 on the both the
+client browser and the server straight away.
+
+ES6 gives us more features and a stronger library, so why not use it?
+">
+            ### ECMAScript 6 (ES6)
+
+            ![javascript](images/javascript.svg)
+
+            * **ES6** is the latest finalised JavaScript/ECMAScript standard
+            * larger standard library
+                - includes promises, new collections, typed arrays
+            * new language constructs
+                - e.g. classes, generators, arrow functions
+            * can use both client and server side using **Babel**
+          </section>
+
+          <section data-markdown>
+            ### Classes
+
+            ```js
+class Point {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+    toString() {
+        return `(${this.x}, ${this.y})`;
+    }
+}
+            ```
+          </section>
+
+          <section data-markdown>
+            ### Inheritence
+
+            ```js
+class ColorPoint extends Point {
+    constructor(x, y, color) {
+        super(x, y);
+        this.color = color;
+    }
+    toString() {
+        return super.toString() + ' in ' + this.color;
+    }
+}
+            ```
+          </section>
+
+          <section data-markdown>
+            ### Importing Other Modules
+
+            Modules are JavaScript files.
+
+            ```js
+// import foo.js in same dir as current file
+import foo from './foo';
+foo.foobar(42);
+
+// import specific variables/functions from a module
+import { foobar } from './foo';
+foobar(42);
+            ```
+          </section>
+
+          <section data-markdown>
+            ### Exporting Symbols
+
+            foo.js:
+
+            ```js
+export function foobar(num) {
+  console.log('FOOBAR:', num);
+}
+            ```
+          </section>
+
+          <section data-markdown>
+            ### Exporting Entire Objects
+
+            person.js:
+
+            ```js
+export default {
+  name: 'Donald',
+  age: 24
+};
+            ```
+
+            another_file.js
+
+            ```
+import person as './person';
+console.log(person.name);
+
+// outputs 'Donald'
+            ```
+          </section>
+
+          <section data-markdown class="medium">
+            ### Promises
+
+            [es6fiddle](http://www.es6fiddle.net/inufuuas/)
+
+            ```js
+let readDb = new Promise(function(resolve, reject) {
+  let row = readRowFromDb();
+  if (row) {
+    resolve(row);
+  } else if {
+    reject('Could not find');
+  }
+});
+
+function onSuccess(row) {
+  console.log('ROW:', row);
+}
+
+function onFailure(err) {
+  console.error(err);
+}
+
+readDb.then(onSuccess, onFailure);
+            ```
+          </section>
+
+          <section data-markdown>
+            ### Summary
+
+            * **React** for rendering DOM elements on UI
+            * **NodeJs** for back-end server and APIs
+            * **ES6** for both front-end and back-end code
+
+            ![react_row](images/react.svg)
+            ![nodejs_row](images/nodejs.svg)
+            ![javascript_row](images/javascript.svg)
+          </section>
+        </section>
+
+        <section>
+          <section data-markdown>
+            ## Let's Build Something!
+          </section>
+
+          <section data-markdown>
+            ### Twitter Search Engine
+          </section>
+
+          <section data-markdown>
+            ![twitter_search_screenshot](images/twitter_search_screenshot.png)
+          </section>
+
+          <section data-markdown>
+            ## What Do We Need?
+
+            * React single page application
+            * web server to render initial page and send it to browser
+                - along with the React app code
+            * `twitterSearchApi` -- RESTful API that will run Twitter searches
+          </section>
+
+          <!-- TODO: create Twitter Searcher app architecture diagram -->
+          <section data-markdown>
+            ### Architecture
+
+            ![twitter_search_architecture](images/twitter_search_architecture.png)
+          </section>
+
+          <section data-markdown>
+            ### Steps
+
+            1. Build single page application
+            2. Serve it as an isomorphic app
+            3. Implement `twitterSearchApi`
+          </section>
+        </section>
+
+        <section>
+          <section data-markdown>
+            ## 1. Single Page Application
+
+            ![react_title](images/react.svg)
+          </section>
+
+          <section data-markdown>
+            ### The DOM
+
+            ![dom](images/dom.svg)
+          </section>
+
+          <section data-markdown>
+            ### In a Nutshell
+
+            ##### Initial Render
+
+            * Represent page elements using virtual DOM
+            * Defines an initial state for each page element
+            * Use virtual DOM to render actual HTML
+          </section>
+
+          <section data-markdown>
+            ### In a Nuthshell
+
+            ##### Stage Changes
+
+            * When state of a component changes:
+                - re-render entire virtual DOM
+                - very fast
+            * Diff old and new virtual DOMs
+                - use diff to compute minimum set of HTML DOM changes to render
+                  the new state
+            * Apply changes to render new state in the browser
+          </section>
+
+          <section data-markdown data-notes="
+The main problem is that DOM was never optimized for creating dynamic UI.
+
+We can work with it using JavaScript and libraries like jQuery (thanks God we have it). But jQuery and others did little to solve performance issues.
+
+Think about modern social networks like Twitter, Facebook or Pinterest. After scrolling a little bit, user will have tens of thousands of nodes. Interact with them efficiently is a huge problem. Try to move a 1000 divs 5 pixel left for example. It may take more then a second. It's a lot of time for modern web. You can optimize the script and use some tricks, but in the end, it's a pain to work with huge pages and dynamic UI.
+">
+            ### What's Wrong with Regular DOM?
+
+            DOM was never optimised for creating dynamic UIs
+          </section>
+
+          <section data-markdown>
+            ### The Virtual DOM
+
+            * React's local and simplified copy of the HTML DOM
+            * Can render HTML without browser DOM
+            * Allows for both client and server side rendering using the same code
+            * Rendering the virtual DOM is much faster than rendering the HTML DOM
+          </section>
+
+          <section data-markdown data-notes="
+If the state of any element in the virtual DOM is modified, then the entire
+React app will be rendered.
+
+We then compute which elements are different, as shown in this second column.
+
+We use the virtual DOM diff to compute the minimum set of browser DOM changes,
+and apply those changes.
+
+Now the state change is reflected in the client's browser.
+">
+            ![virtual_dom_diff](images/virtual_dom_diff.png)
+          </section>
+
+          <section data-markdown>
+            ### Building Blocks
+
+            * `ReactElement`
+            * `ReactNode`
+            * `ReactComponent`
+          </section>
+
+          <section data-markdown data-notes="
+Emphasise that this rendering is done on the browser, as it directly inserts the
+rendered HTML DOM elements into an existing DOM element on the page.
+">
+            `ReactElement` &mdash; [jsfiddle](http://jsfiddle.net/tf55qk5f/)
+
+            Lowest type in the virtual DOM, similar to an XML element.
+
+            These can represent complex UI components.
+
+            ```js
+let props = { id: 'root-container' };
+let children = 'just text, but can be list of child elements';
+let root = React.createElement('div', props, children);
+
+// Render virtual DOM element into real DOM,
+// inserting into existing element on page.
+ReactDOM.render(root, document.getElementById('app-container'));
+            ```
+          </section>
+
+          <section data-markdown>
+            `ReactNode`
+
+            * Building blocks for virtual DOM hierarchy
+            * Can be:
+                - `ReactElement`
+                - `string`
+                - `number`
+                - array of `ReactNode`s
+          </section>
+
+          <section data-markdown>
+            ![virtual_dom](images/virtual_dom.svg)
+          </section>
+
+          <section data-markdown data-notes="
+You can use React using only ReactElements but to really take advantage of React,
+you'll want to use ReactComponents to create encapsulations with embedded state.
+
+If you've used Angular before, then I'd say a React component is similar to an
+Angular directive. They're essentially custom elements which manage their own
+state and update the view as necessary.
+">
+            `ReactComponent`
+
+            A specification on how to build `ReactElement`.
+
+            `ReactElement`s are essentially *instantiations* of components.
+          </section>
+
+          <section data-markdown>
+            [jsfiddle](http://jsfiddle.net/j5no6mpq/)
+
+            ```html
+import React from 'react';
+
+class Message extends React.Component {
+    render() {
+        return &lt;div className='message'&gt;{this.props.contents}&lt;/div&gt;;
+    }
+}
+            ```
+
+            ```html
+import ReactDOM from 'react';
+
+ReactDOM.render(
+    &lt;Message contents="Hello world!" /&gt;,
+    document.getElementById('app-view'),
+    function() {
+        console.log('Callback that executes after rendering');
+    }
+);
+            ```
+          </section>
+
+          <section data-markdown>
+            ### wat?
+
+            ```html
+return &lt;div className='message'&gt;{this.props.contents}&lt;/div&gt;;
+            ```
+          </section>
+
+          <section data-markdown>
+            ### JSX
+
+            * Preprocessor step that adds XML syntax to JavaScript
+            * JSX elements are parsed and replaced w/ generated code
+                - often parsed in-browser for development
+                - typically parsed prior to deploying for efficiency
+            * Optional
+          </section>
+
+          <section data-markdown>
+              ##### Input (JSX)
+
+              ```html
+&lt;Message contents="Hello world!" /&gt;
+              ```
+
+              ##### Output (JavaScript)
+
+              ```js
+React.createElement(Message, { contents: 'Hello world!' });
+              ```
+          </section>
+
+          <section data-markdown>
+            ### Nested Components
+
+            ##### Input (JSX)
+
+            ```html
+import config from './config';
+
+let App = (
+  &lt;Form endpoint={config.submitEndpoint}&gt;
+    &lt;FormRow&gt;
+      &lt;FormLabel text="Name" /&gt;
+      &lt;FormInput /&gt;
+    &lt;/FormRow&gt;
+    &lt;FormRow&gt;
+      &lt;FormLabel text="Age" /&gt;
+      &lt;FormInput /&gt;
+    &lt;/FormRow&gt;
+  &lt;/Form&gt;
+);
+            ```
+          </section>
+
+          <section>
+            <h3>Nested Components</h3>
+
+            <h5>Output (JavaScript)</h5>
+            <pre><code class="hljs js small">import config from './config';
+
+let app = React.createElement(
+    Form, { endpoint: config.submitEndpoint },
+    [
+        React.createElement(
+            FormRow, {},
+            [
+                React.createElement(FormLabel, { text: 'Name' }),
+                React.createElement(FormInput, {}),
+            ]
+        ),
+        React.createElement(
+            FormRow, {},
+            [
+                React.createElement(FormLabel, { text: 'Age' }),
+                React.createElement(FormInput, {}),
+            ]
+        ),
+    ]
+);
+            </code></pre>
+          </section>
+
+          <section data-markdown>
+            ### Props
+
+            * every element and component has a `props` attribute
+            * short for *properties*
+            * plain JS object
+            * represents the component's *configuration* or *parameters*
+            * used to render the component in different ways
+          </section>
+
+          <section data-markdown>
+            ```html
+class TextEntry extends React.Component {
+  render() {
+    return &lt;input type="text" value={this.props.initialValue} /&gt;;
+  }
+};
+
+React.render(
+  &lt;TextEntry initialValue="42" /&gt;,
+  document.getElementById('container'));
+            ```
+          </section>
+
+          <section data-markdown>
+            ### props are Not State
+
+            * `props` are received from parent components
+            * intended to be declarative
+            * only set at element definition time
+            * component **cannot** change its own `props`
+                - but it is responsible for putting together the props of its
+                  child components
+          </section>
+
+          <section data-markdown>
+            ### State
+
+            * attributes of a component that can change
+                - typically due to user interaction
+            * define an **initial state**
+            * state can be used to define props for child components
+            * if *any* stateful attribute is mutated:
+                - virtual DOM is rendered again
+            * always change state using `this.setState()`
+          </section>
+
+          <section data-markdown class="small">
+            [jsfiddle](http://jsfiddle.net/gae7v9eh/)
+
+            ```js
+class TextEntry extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      val: 0
+    };
+    this.onChange = this.onChange.bind(this);
+  }
+
+  onChange(event) {
+    if (event.target.value === '') { event.target.value = 0; }
+    let val = parseInt(event.target.value);
+    if (!isNaN(val)) { this.setState({ val: val }); }
+  };
+
+  render() {
+    return (
+      &lt;div&gt;
+        &lt;input type="text" value={this.state.val} onChange={this.onChange} /&gt;
+        &lt;p&gt;Weighted value: {this.state.val * 2}&lt;/p&gt;
+      &lt;/div&gt;);
+  }
+}```
+          </section>
+
+          <section data-markdown data-notes="
+If your component generates different outputs for the same combination of props
+and state then you're doing something wrong.
+
+The core benefit of react is that components are predictable, so they can be
+tested and resused.
+">
+            ### Props vs. State
+
+            Props and state both:
+
+            * plain JS objects
+            * trigger a **render update** when modified
+            * deterministic
+          </section>
+
+          <section data-markdown data-notes="
+If a component needs to alter one of its attributes at some point in time.
+">
+            ### Which to Use?
+
+            If a component needs to alter one of its attributes
+
+            that attribute should be part of its **state**
+
+            otherwise it should just be a **prop** for that component.
+          </section>
+
+          <section data-markdown>
+            Back to the Twitter Searcher...
+          </section>
+
+          <section data-markdown>
+            ![twitter_search_screenshot](images/twitter_search_screenshot.png)
+          </section>
+
+          <section data-markdown data-notes="
+digraph G {
+  r1 [label=TweetRow];
+  r2 [label='...'];
+  r3 [label=TweetRow];
+  input1 [label='input(text)']
+
+  TweetSearch -> TextInput;
+  TextInput -> input1;
+  TweetSearch -> TweetTable;
+  TweetTable -> r1;
+  TweetTable -> r2;
+  TweetTable -> r3;
+}
+">
+            ![twitter_search_screenshot_search_split](images/twitter_search_screenshot_search_split.png)
+            ![twitter_search_components](images/twitter_search_components.svg)
+          </section>
+
+          <section data-markdown>
+            [Twitter Search Components](https://github.com/DonaldWhyte/isomorphic-react-workshop/tree/master/twitterSearchApp/shared/components/twitter)
+          </section>
+
+          <section data-markdown>
+            Let's expand this model to an entire site
+          </section>
+
+          <section data-markdown data-notes="
+digraph G {
+  'App' -> 'Home';
+  'App' -> 'About';
+  'App' -> 'NotFound (404)';
+  'App' -> 'TweetSearch';
+
+  p1 [label=Paragraph];
+  p2[label=Paragraph];
+  p3 [label=Paragraph];
+
+  'Home' -> p1;
+  'About' -> p2;
+  'NotFound (404)' -> p3;
+
+  r1 [label=TweetRow];
+  r2 [label='...'];
+  r3 [label=TweetRow];
+  input1 [label='input(text)']
+
+  TweetSearch -> TextInput;
+  TextInput -> input1;
+  TweetSearch -> TweetTable;
+  TweetTable -> r1;
+  TweetTable -> r2;
+  TweetTable -> r3;
+}
+">
+            ![twitter_app_components](images/twitter_app_components.svg)
+          </section>
+
+          <section data-markdown>
+            ### React Router
+
+            * Client and server side routing library
+            * Keeps your UI in sync with the URL
+            * Takes a path and uses it to generate the correct components
+          </section>
+
+          <section data-markdown class="medium">
+            router.js:
+
+            ```js
+import React from 'react';
+import { Router, Route, IndexRoute, browserHistory } from 'react-router';
+
+// Top-level ReactElement that stores application.
+// Apply common styles, headers, footers, etc. here
+function App(props) {
+  return (
+    &lt;div id='app-container'&gt;
+      &lt;h1&gt;Twitter Searcher&lt;/h1&gt; { this.props.children }
+    &lt;/div&gt;);
+}
+
+// `browserHistory` will keep track of the current browser URL
+let router = (
+  &lt;Router history={browserHistory}&gt;
+    &lt;Route path="/" component={App}&gt;
+      &lt;IndexRoute component={Home} /&gt;
+    &lt;/Route&gt;
+  &lt;/Router>
+);
+            ```
+          </section>
+
+          <section data-markdown data-notes="
+digraph G {
+  'Home' [style='filled', fillcolor='lightgrey'];
+  'About' [style='filled', fillcolor='lightgrey'];
+  'NotFound (404)' [style='filled', fillcolor='lightgrey'];
+  'TweetSearch' [style='filled', fillcolor='lightgrey'];
+
+  'App' -> 'Home' [label='/'];
+  'App' -> 'About' [label='/about'];
+  'App' -> 'NotFound (404)' [label='/*'];
+  'App' -> 'TweetSearch' [label='/search'];
+
+  p1 [label=Paragraph];
+  p2[label=Paragraph];
+  p3 [label=Paragraph];
+
+  'Home' -> p1;
+  'About' -> p2;
+  'NotFound (404)' -> p3;
+
+  r1 [label=TweetRow];
+  r2 [label='...'];
+  r3 [label=TweetRow];
+  input1 [label='input(text)']
+
+  TweetSearch -> TextInput;
+  TextInput -> input1;
+  TweetSearch -> TweetTable;
+  TweetTable -> r1;
+  TweetTable -> r2;
+  TweetTable -> r3;
+}
+">
+            ![twitter_router](images/twitter_router.svg)
+          </section>
+
+          <section data-markdown class="medium">
+            ```js
+import App from './components/App.jsx';
+import Home from './components/Home';
+import About from './components/About';
+import NotFound from './components/NotFound';
+import TweetSearch from './components/twitter/TweetSearch';
+
+let router = (
+  &lt;Router history={browserHistory}&gt;
+    &lt;Route name="twitter-searcher" path="/" component={App}&gt;
+      &lt;IndexRoute component={Home} /&gt;
+      &lt;Route path="about" component={About} /&gt;
+      &lt;Route path="search" component={TweetSearch} /&gt;
+      &lt;Route path="*" component={NotFound} /&gt;
+    &lt;/Route&gt;
+  &lt;/Router&gt;
+);
+            ```
+          </section>
+
+          <section data-markdown>
+            ### Rendering with Routes on the Client
+
+            * we have a heavy client, a single page app
+            * routing will take place on the client
+            * `browserHistory` will:
+                - intercept browser URL
+                - render correct component
+                - *without* sending new request to server
+          </section>
+
+          <section data-markdown>
+            We define all components, routes and the router on the client, as
+            shown before.
+
+            Then we render the correct route into HTML like so:
+
+            ```js
+// after important all top-level components and setting up router...
+
+// Use current URL to render correct components.
+// Inject rendered components into the 'app-view' HTML DOM element.
+
+render(router, document.getElementById('app-view'));
+            ```
+          </section>
+
+          <section data-markdown>
+            ### Summary
+
+            Client does almost everything.
+
+            * all React components/elems/routes defined on browser
+            * components run business logic that's defined on client
+                - using imported libraries
+            * this code will be bundled into **one JavaScript file**
+            * browser requests that one file
+            * now to create that web server which provides that file
+          </section>
+        </section>
+
+        <section>
+          <section data-markdown>
+            ## 2. Serving Application
+          </section>
+
+          <section data-markdown>
+            ![npm](images/npm.svg)
+
+            * JavaScript Package Manager
+            * over 250,000 packages
+            * manages metadata on your JS projects, such as:
+                - project's name, purpose and author
+                - execution and test commands
+                - dependencies
+          </section>
+
+          <section data-markdown>
+            ### Generate JavaScript Project
+
+            * `npm init`
+            * generates `package.json` file that stores project metadata
+            * all node projects use this file
+          </section>
+
+          <section data-markdown>
+            ### Install Dependencies
+
+            ```bash
+npm install --save react react-router
+            ```
+
+            adds dependencies to `package.json`.
+          </section>
+
+          <section data-markdown>
+            ### Serving the React App
+          </section>
+
+          <section data-markdown>
+            ![what_is_webpack](images/what-is-webpack.png)
+          </section>
+
+          <section data-markdown>
+            ### Web Pack
+
+            ![webpack](images/webpack.svg)
+
+            * webpack module bundler
+            * compiles all ES6/JSX modules into browser-compatible JS
+            * compiles React app into a single static asset
+            * `bundle.js`
+          </section>
+
+          <section data-markdown>
+          ```html
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;title&gt;Twitter Searcher&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;div id="app-view"&gt;&lt;/div&gt;
+    &lt;script type="application/javascript" src="/assets/bundle.js"&gt;
+    &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+          ```
+          </section>
+
+          <section data-markdown>
+            ### Development
+
+            ```bash
+            npm install -g webpack webpack-dev-server
+            webpack-dev-server --progress --colors
+            ```
+
+            * binds small express server to `localhost:8080`
+            * watches project files and automatically recompiles bundle when
+              changes are detected
+            * page at `localhost:8080` automatically updates
+          </section>
+
+          <section data-markdown data-notes="
+For example, I know a few companies actually serve the entire web app on
+Amazon S3.
+">
+            ### Production Deployment
+
+            ```
+            npm install -g webpack
+            webpack --progress --color -p --config webpack.prod.config.js
+            ```
+
+            * build webpack bundle with production config
+            * e.g. optimised/minified JavaScript
+            * entire app can now be served as static files:
+                - index.html, bundle.js, stylesheets and images
+          </section>
+
+          <section data-markdown>
+            ### Webpack Requirements
+
+            * Babel plugins to compile ES6 / JSX
+                 - `npm install babel-loader --save`
+                 - `.babelrc` file to specify compiler options
+            * `webpack.config.js`
+            * likely a production config as well
+          </section>
+
+          <section data-markdown>
+            ### Isomorphic Support
+
+            * we want to make this an isomorphic app
+            * means server will render the full page in its initial state
+            * just using webpack's `bundle.js` means client does everything
+
+            Let's use a small HTTP server for this.
+          </section>
+
+          <section data-markdown>
+            ### Express
+
+            > Fast, unopinionated, minimalist web framework for node.
+
+            * lightweight HTTP server library
+            * defines API endpoints using URL routes
+                - e.g. `/auth/login`
+            * defines request handling logic for each endpoint
+          </section>
+
+          <section data-markdown>
+            ### Simple HTTP Server
+
+            ```bash
+npm install --save express body-parser
+            ```
+
+            ```js
+const express = require('express');
+const bodyParser = require('body-parser');
+
+const app = express();
+app.use(bodyParser.json()); // for parsing application/json
+
+app.post('/hello', function (req, res) {
+  res.json({
+    message: 'Hello ' + req.body.name + '!'
+  });
+});
+
+app.listen(8080);
+            ```
+          </section>
+
+          <section data-markdown>
+            ### What Should the Server Do?
+
+            * intercept all endpoints
+            * use endpoint to determine react route
+            * render page in the route's initial state
+            * return rendered HTML
+          </section>
+
+          <section data-markdown class="medium">
+          ```js
+// create express app
+
+import { renderToString } from 'react-dom/server';
+import { RouterContext, match } from 'react-router';
+import createLocation from 'history/lib/createLocation';
+import routes from 'routes'; // shared app routes
+
+// Intercept all routes!
+app.use((req, res) => {
+
+  // Take endpoint the client used and resolve it into react-router location
+  const location = createLocation(req.url);
+
+  // Attempt to match location to one of the app's routes
+  match({ routes, location }, (err, redirectLocation, renderProps) =&gt; {
+    // [ HANDLE ERRORS ]
+
+    // render initial view of the routes into HTML
+    const InitialView = &lt;RouterContext {...renderProps} /&gt;;
+    const componentHTML = renderToString(InitialView);
+
+    // Inject rendered HTML into a shell document and return that to client
+    res.status(200).end(`
+      &lt;!DOCTYPE html&gt;
+      &lt;html&gt;
+        &lt;head&gt; &lt;meta charset="UTF-8"&gt; &lt;title&gt;Twitter Searcher&lt;/title&gt; &lt;/head&gt;
+        &lt;body&gt;
+          &lt;div id="app-view"&gt;${componentHTML}&lt;/div&gt;
+          &lt;script type="application/javascript" src="/assets/bundle.js"&gt;
+          &lt;/script&gt;
+        &lt;/body&gt;
+      &lt;/html&gt;
+    `);
+  });
+});
+          ```
+          </section>
+
+          <section data-markdown>
+          ```js
+// Define static assets to serve clients.
+// Just serve files from local directory for now.
+const assetPath = path.join(__dirname, '..', 'assets');
+app.use('/assets', express.static(assetPath));
+          ```
+          </section>
+
+          <section data-markdown>
+            ### Summary
+
+            * bundle React web application into `bundle.js` file
+                - webpack
+            * server file statically
+            * create small web server to render initial state of page
+                - and serve static `bundle.js` file
+          </section>
+        </section>
+
+        <section>
+          <section data-markdown>
+            ## 3. RESTful § API
+          </section>
+
+          <section data-markdown>
+            Will search Twitter for tweets matching user queries
+          </section>
+
+          <section data-markdown>
+            `twitterSearchApi`
+
+            * node service with single endpoint:
+                - `/api/search` &mdash; search for tweets matching supplied query
+            * will search using Twitter's own search API
+            * service is just a thin wrapper around Twitter's API
+          </section>
+
+          <section data-markdown>
+            ### Another Express Service
+
+            ```js
+import express from 'express';
+import bodyParser from 'body-parser';
+
+const app = express();
+app.use(bodyParser.json());
+
+app.use('/api/search', require('./routes/search'));
+
+const port = process.env.PORT || 8080;
+app.listen(port, function() {
+    console.log('Started twittersearchapi on port #{port}')
+});
+            ```
+          </section>
+
+          <section data-markdown class="medium" data-notes="
+We're not going to dive into the details of how the /api/search endpoint uses
+the Twitter API to search for tweets. The focus of this presentation is building
+an isomorphic app, and this would just distract us from that focus.
+
+There's plenty of resources online to teach you how to use the Twitter API, and
+you can read the code for twitterSearchApi Node service, which is available
+the same GitHub repo as this talk.
+">
+             /api/search
+
+             ```js
+import { Router } from 'express';
+import Config from '../../config.js';
+
+const router = Router();
+
+function search(query) {
+  return new Promise(function(resolve, reject) {
+    // twitter search API calls go here
+  });
+}
+
+router.post('/', function(req, res) {
+  if (query) {
+    search(query).then(function(tweets) {
+      res.status(200).json({ tweets: tweets });
+    }, function (err) {
+      res.status(500).json({ error: err });
+    });
+  } else {
+    res.status(400).json({ error: "No query specified" });
+  }
+});
+
+export default router;
+             ```
+          </section>
+
+          <section data-markdown>
+            ### Call API on Browser Client
+
+            ```js
+import axios from 'axios';
+
+// put URL in config
+const API_URL = 'http://127.0.0.1:8080/api/search';
+const reqBody = { query: "@DonaldWhyte" };
+
+axios.post(API_URL, reqBody).then(
+  function(response) {
+    // Log each returned tweet
+    response.tweets.forEach(function(t) {
+      console.log(JSON.stringify(t));
+    });
+  },
+  function(err) {
+    console.error('Error:', err);
+  }
+);
+            ```
+          </section>
+
+          <section data-markdown class="medium">
+            ### Twitter Searcher App
+
+            shared/services/twitter.js:
+
+            ```
+            import { searchTweets } from '../../services/twitter';
+
+            export default class TweetSearch extends React.Component {
+
+              // called whenever text entry value changes
+              onQueryChange = (query) => {
+                searchTweets(query).then(
+                  function(tweets) {
+                    this.setState({     // triggers re-render with new tweets
+                      tweets: tweets
+                    });
+                  },
+                  function(err) {
+                    console.error('Failed to search Twitter:', err);
+                    this.setState({     // triggers re-render with no tweet
+                      tweets: []
+                    });
+                  }
+                );
+              }
+            ```
+          </section>
+        </section>
+
+        <section>
+          <section data-markdown>
+            ## Conclusion
+          </section>
+
+          <section data-markdown data-notes="
+Poorly optimised for search engines
+
+Can lead to bad user experience if page's initial state is partially loaded.
+
+Can be difficult to maintain.
+">
+            Single page applications are starting to become the norm for rich
+            web applications.
+
+            However, SAPs have their problems.
+          </section>
+
+          <section data-markdown>
+            Isomorphic applications are a middle-ground
+
+            Render initial page on the server, then let the client take over
+
+            Requires ability to write UI code once and have it run everywhere
+          </section>
+
+          <section data-markdown>
+            ![react](images/react.svg)
+
+            React is a JavaScript-based UI framework.
+
+            Build components which manages a specific widget on the screen
+            render elements on page and also manage.
+
+            Components are isolated, reusable and testable units, whose details
+            are abstracted from the real browser DOM.
+          </section>
+
+          <section data-markdown class="medium">
+            Deploy apps by bundling them in a single static JS file:
+
+            ```bash
+webpack --progress --color -p --config webpack.prod.config.js
+            ```
+
+            Serve using bootstrap HTML:
+
+            ```html
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Twitter Searcher&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div id="app-view"&gt;&lt;/div&gt;
+  &lt;script type="application/javascript" src="/assets/bundle.js"&gt;
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+            ```
+          </section>
+
+          <section data-markdown>
+            Render initial page state on server for isomorphism:
+
+```
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Twitter Searcher&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div id="app-view"&gt;${ initialPageHTML }&lt;/div&gt;
+  &lt;script type="application/javascript" src="/assets/bundle.js"&gt;
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+```
+          </section>
+
+          <section data-markdown data-notes="
+The microservice model.
+">
+            Build small, single purpose APIs for your app to use.
+
+            ![arch_wsap](images/arch_sap.svg)
+          </section>
+
+          <section data-markdown>
+            Node / Express
+
+            RESTful API that backs the React app
+
+            Uses Twitter Search API to search for tweets using queries specified
+            on the app
+          </section>
+
+          <section data-markdown>
+            [Find the slides and code here](https://github.com/DonaldWhyte/isomorphic-react-workshop)
+          </section>
+
+          <section data-markdown>
+            ### Additional Topics
+
+            * [Why Do We Need Single Page Applications](http://stackoverflow.com/questions/16642259/why-do-we-need-a-single-page-application)
+            * [Advantages/Disadvantages of SAPs](http://stackoverflow.com/questions/21862054/single-page-application-advantages-and-disadvantages)
+            * [React Diffing Algorithm](http://calendar.perfplanet.com/2013/diff/)
+            * [React Testing](https://facebook.github.io/react/docs/test-utils.html)
+            * [9 Things Every React Beginner Should Know](https://camjackson.net/post/9-things-every-reactjs-beginner-should-know)
+          </section>
+
+          <section data-markdown>
+            # Questions?
+          </section>
+        </section>
+
+      </div>
+    </div>
+
+    <script src="lib/js/head.min.js"></script>
+    <script src="js/reveal.js"></script>
+    <script>
+      Reveal.initialize({
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+
+        transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+        dependencies: [
+          { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+          { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+          { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+          { src: 'plugin/zoom-js/zoom.js', async: true },
+          { src: 'plugin/notes/notes.js', async: true }
+        ]
+      });
+    </script>
+  </body>
+</html>

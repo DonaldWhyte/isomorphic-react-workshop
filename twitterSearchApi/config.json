@@ -1,0 +1,6 @@
+{
+    "twitter" : {
+        "consumerKey": "INSERT_APP_KEY_HERE",
+        "consumerSecret": "INSERT_SECRET_KEY_HERE"
+    }
+}

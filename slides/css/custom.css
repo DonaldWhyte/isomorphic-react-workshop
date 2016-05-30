@@ -1,0 +1,175 @@
+#company-notice {
+    margin-top: 64px;
+    float: right;
+}
+
+#company-notice p {
+    font-size: 18px;
+    margin: 0px;
+    text-align: center;
+}
+
+.reveal section img {
+    border: 0px;
+    box-shadow: none;
+}
+
+code {
+    color: #22F;
+}
+
+.small code,
+code.small {
+    font-size: 16px;
+    line-height: 18px;
+}
+
+.medium code,
+code.medium {
+    font-size: 18px;
+    line-height: 20px;
+}
+
+.left-col {
+    width: 50%;
+    float: left;
+}
+.right-col {
+    width: 50%;
+    float: right;
+}
+
+.left-col75 {
+    width: 75%;
+    float: left;
+}
+
+.right-col25 {
+    width: 25%;
+    float: right;
+}
+
+.clear-col {
+    float: none;
+    clear: both;
+}
+
+.architecture blockquote {
+    margin-bottom: 32px;
+}
+
+.architecture blockquote p {
+    font-size: 32px;
+    margin: 0px;
+}
+
+/* Image Sizes */
+
+img {
+    margin: 0px !important;
+}
+
+img[alt="postgresql"] {
+    width: 120px;
+}
+
+img[alt="postgresql_row"] {
+    width: 100px;
+}
+
+img[alt="react"] {
+    width: 120px;
+}
+
+img[alt="react_row"] {
+    width: 120px;
+}
+
+img[alt="react_title"] {
+    width: 240px;
+}
+
+img[alt="nodejs"] {
+    width: 320px;
+}
+
+img[alt="nodejs_row"] {
+    width: 240px;
+}
+
+img[alt="javascript"] {
+    width: 120px;
+}
+
+img[alt="javascript_row"] {
+    width: 100px;
+}
+
+img[alt="npm"] {
+    width: 240px;
+}
+
+img[alt="webpack"] {
+    width: 120px;
+}
+
+img[alt="openstack"] {
+    width: 200px;
+}
+
+img[alt="openstack_image_creation"] {
+    height: 500px;
+}
+
+img[alt="redhat"] {
+    width: 160px;
+}
+
+img[alt="ubuntu"] {
+    width: 145px;
+}
+
+img[alt="bcc_networking"] {
+    width: 300px;
+}
+
+img[alt="client_side_sap"] {
+    width: 500px;
+}
+
+img[alt="isomorphic_sap"] {
+    width: 500px;
+}
+
+img[alt="arch_mainframe"] {
+    width: 600px;
+}
+
+img[alt="arch_desktops"] {
+    width: 600px;
+}
+
+img[alt="arch_clientserver"] {
+    width: 600px;
+}
+
+img[alt="arch_sap"] {
+    width: 600px;
+}
+
+img[alt="twitter_search_screenshot"] {
+    width: 800px;
+}
+
+img[alt="twitter_search_screenshot_search_split"] {
+    width: 700px;
+}
+
+img[alt="twitter_search_components"] {
+    width: 600px;
+}
+
+img[alt="bcc_networking_right"] {
+    width: 250px;
+    float: right;
+}
