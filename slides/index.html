@@ -889,7 +889,7 @@ digraph G {
           </section>
 
           <section data-markdown>
-            [Twitter Search Components](TODO)
+            [Twitter Search Components](https://github.com/DonaldWhyte/isomorphic-react-workshop/tree/master/twitterSearchApp/shared/components/twitter)
           </section>
 
           <section data-markdown>
@@ -1292,16 +1292,42 @@ app.listen(port, function() {
             ```
           </section>
 
-          <section data-markdown class="medium">
+          <section data-markdown class="medium" data-notes="
+We're not going to dive into the details of how the /api/search endpoint uses
+the Twitter API to search for tweets. The focus of this presentation is building
+an isomorphic app, and this would just distract us from that focus.
+
+There's plenty of resources online to teach you how to use the Twitter API, and
+you can read the code for twitterSearchApi Node service, which is available
+the same GitHub repo as this talk.
+">
              /api/search
 
              ```js
 import { Router } from 'express';
 import Config from '../../config.js';
 
+const router = Router();
+
+function search(query) {
+  return new Promise(function(resolve, reject) {
+    // twitter search API calls go here
+  });
+}
+
 router.post('/', function(req, res) {
-  // TODO
+  if (query) {
+    search(query).then(function(tweets) {
+      res.status(200).json({ tweets: tweets });
+    }, function (err) {
+      res.status(500).json({ error: err });
+    });
+  } else {
+    res.status(400).json({ error: "No query specified" });
+  }
 });
+
+export default router;
              ```
           </section>
 
@@ -1312,7 +1338,7 @@ router.post('/', function(req, res) {
 import axios from 'axios';
 
 // put URL in config
-const API_URL = 'http://100.70.19.227:8080/api/search';
+const API_URL = 'http://127.0.0.1:8080/api/search';
 const reqBody = { query: "@DonaldWhyte" };
 
 axios.post(API_URL, reqBody).then(
@@ -1452,13 +1478,10 @@ The microservice model.
           <section data-markdown>
             Node / Express
 
-            RESTful API that spoke to the Twitter Search API
-          </section>
+            RESTful API that backs the React app
 
-          <section data-markdown data-notes="
-TODO
-">
-            TODO: proper conclusion
+            Uses Twitter Search API to search for tweets using queries specified
+            on the app
           </section>
 
           <section data-markdown>
