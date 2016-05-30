@@ -162,7 +162,11 @@ img[alt="twitter_search_screenshot"] {
 }
 
 img[alt="twitter_search_screenshot_search_split"] {
-    width: 500px;
+    width: 700px;
+}
+
+img[alt="twitter_search_components"] {
+    width: 600px;
 }
 
 img[alt="bcc_networking_right"] {

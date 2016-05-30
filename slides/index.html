@@ -496,6 +496,7 @@ readDb.then(onSuccess, onFailure);
             * `twitterSearchApi` -- RESTful API that will run Twitter searches
           </section>
 
+          <!-- TODO: create Twitter Searcher app architecture diagram -->
           <section data-markdown>
             ### Architecture
 
@@ -863,21 +864,15 @@ If a component needs to alter one of its attributes at some point in time.
             ![twitter_search_screenshot](images/twitter_search_screenshot.png)
           </section>
 
-          <section data-markdown>
-            ![twitter_search_screenshot](images/twitter_search_screenshot.png)
-          </section>
-
           <section data-markdown data-notes="
 digraph G {
   r1 [label=TweetRow];
   r2 [label='...'];
   r3 [label=TweetRow];
   input1 [label='input(text)']
-  input2 [label='input(button)']
 
   TweetSearch -> TextInput;
   TextInput -> input1;
-  TextInput -> input2;
   TweetSearch -> TweetTable;
   TweetTable -> r1;
   TweetTable -> r2;
@@ -915,11 +910,9 @@ digraph G {
   r2 [label='...'];
   r3 [label=TweetRow];
   input1 [label='input(text)']
-  input2 [label='input(button)']
 
   TweetSearch -> TextInput;
   TextInput -> input1;
-  TextInput -> input2;
   TweetSearch -> TweetTable;
   TweetTable -> r1;
   TweetTable -> r2;
@@ -964,7 +957,39 @@ let router = (
             ```
           </section>
 
-          <section data-markdown>
+          <section data-markdown data-notes="
+digraph G {
+  'Home' [style='filled', fillcolor='lightgrey'];
+  'About' [style='filled', fillcolor='lightgrey'];
+  'NotFound (404)' [style='filled', fillcolor='lightgrey'];
+  'TweetSearch' [style='filled', fillcolor='lightgrey'];
+
+  'App' -> 'Home' [label='/'];
+  'App' -> 'About' [label='/about'];
+  'App' -> 'NotFound (404)' [label='/*'];
+  'App' -> 'TweetSearch' [label='/search'];
+
+  p1 [label=Paragraph];
+  p2[label=Paragraph];
+  p3 [label=Paragraph];
+
+  'Home' -> p1;
+  'About' -> p2;
+  'NotFound (404)' -> p3;
+
+  r1 [label=TweetRow];
+  r2 [label='...'];
+  r3 [label=TweetRow];
+  input1 [label='input(text)']
+
+  TweetSearch -> TextInput;
+  TextInput -> input1;
+  TweetSearch -> TweetTable;
+  TweetTable -> r1;
+  TweetTable -> r2;
+  TweetTable -> r3;
+}
+">
             ![twitter_router](images/twitter_router.svg)
           </section>
 
