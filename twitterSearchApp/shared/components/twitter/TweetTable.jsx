@@ -7,7 +7,7 @@ function TweetRow(props) {
       <td>{props.author}</td>
       <td>{props.datetime}</td>
       <td>{props.text}</td>
-      <td><a href="{props.link}">view</a></td>
+      <td><a href={props.link} target="_blank">view</a></td>
     </tr>
   );
 }

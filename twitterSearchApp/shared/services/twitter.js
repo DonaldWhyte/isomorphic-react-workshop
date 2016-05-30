@@ -1,16 +1,7 @@
 import axios from 'axios';
 
-const API_URL = 'http://100.70.19.227:8080/api/';
-
-function ensureIsArray(arr) {
-  if (!arr) {
-    return [];
-  } else if (arr.constructor !== Array) {
-    return [ arr ];
-  } else {
-    return arr;
-  }
-}
+// TODO: this URL should really be in a config file or environment variable
+const API_URL = 'http://127.0.0.1:8080/api/';
 
 // TODO: fix bug when there's only one match, but nothing is returned
 function sendTweetApiRequest(reqType, body, resolve, reject) {
@@ -38,9 +29,8 @@ export function searchTweets(query) {
     sendTweetApiRequest('search', { query: query },
       function(response) {
         console.log(response);
-
-        let ids = ensureIsArray(response.ids);
-        resolve(ids);
+        const tweets = response.tweets || [];
+        resolve(tweets);
       },
       function(err) {
         reject(err);
